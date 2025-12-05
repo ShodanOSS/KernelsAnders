@@ -174,7 +174,7 @@ write memory
 SSH CONFIGURATION (RECOMMENDED FOR SECURE REMOTE ACCESS)
 
 enable
-configure terminal
+conf t
 
 ! --- Set a domain name 
 ip domain-name example.local
@@ -361,3 +361,4 @@ configure terminal
 end
 
 write memory
+
