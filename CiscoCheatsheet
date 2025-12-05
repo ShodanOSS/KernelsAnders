@@ -1,0 +1,724 @@
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324
+325
+326
+327
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338
+339
+340
+341
+342
+343
+344
+345
+346
+347
+348
+349
+350
+351
+352
+353
+354
+355
+356
+357
+358
+359
+360
+361
+362
+BASIC NAVIGATION / MODES
+
+enable                       ! go from user EXEC (>) to privileged EXEC (#)
+configure terminal           ! go from privileged EXEC to global config mode
+end                          ! exit to privileged EXEC
+exit                         ! back out one mode (e.g., from line or interface config)
+write memory                 ! save running-config to startup-config (older IOS)
+copy running-config startup-config   ! same thing, newer syntax
+
+show running-config          ! view current configuration
+show startup-config          ! view saved configuration
+show ip interface brief      ! quick view of interfaces, IPs, and status
+show interfaces              ! detailed interface status
+show vlan brief              ! on switches – list VLANs and assigned ports
+show ip route                ! show routing table (on routers L3 devices)
+show version                 ! IOS version, hardware info
+
+
+BASIC ROUTER SETUP
+
+enable
+configure terminal
+
+hostname R1                  ! set router hostname
+
+no ip domain-lookup          ! optional: stop IOS from DNS-lookup on typos
+
+! -- Configure interface IP addresses 
+interface GigabitEthernet0/0
+ description LAN interface
+ ip address 192.168.10.1 255.255.255.0
+ no shutdown
+exit
+
+interface GigabitEthernet0/1
+ description WAN / uplink interface
+ ip address 10.0.0.1 255.255.255.252
+ no shutdown
+exit
+
+! -- Default route (if needed) 
+ip route 0.0.0.0 0.0.0.0 10.0.0.2   ! send unknown traffic to next-hop 10.0.0.2
+
+end
+write memory
+
+
+BASIC SWITCH SETUP (LAYER 2 SWITCH)
+
+enable
+configure terminal
+
+hostname S1                  ! set switch hostname
+
+no ip domain-lookup          ! optional
+
+! -- Create VLANs 
+vlan 10
+ name USERS
+exit
+
+vlan 20
+ name SERVERS
+exit
+
+! -- Assign access ports to VLANs 
+interface range FastEthernet0/1 - 12
+ switchport mode access
+ switchport access vlan 10
+ spanning-tree portfast       ! optional: for end devices
+exit
+
+interface range FastEthernet0/13 - 24
+ switchport mode access
+ switchport access vlan 20
+ spanning-tree portfast       ! optional
+exit
+
+! -- (Trunk to a router / another switch) 
+interface GigabitEthernet0/1
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20
+exit
+
+! -- Switch management SVI (VLAN interface for management IP) 
+interface vlan 10
+ ip address 192.168.10.2 255.255.255.0
+ no shutdown
+exit
+
+! -- Default gateway for L2 switch 
+ip default-gateway 192.168.10.1    ! usually the router’s LAN interface
+
+end
+write memory
+
+
+BASIC L3 SWITCH SETUP (IF YOUR SWITCH DOES ROUTING)
+
+enable
+configure terminal
+
+hostname SW1-Routing
+
+! -- Enable routing on L3 switch
+ip routing
+
+! -- SVIs with IP addresses 
+interface vlan 10
+ ip address 192.168.10.1 255.255.255.0
+ no shutdown
+exit
+
+interface vlan 20
+ ip address 192.168.20.1 255.255.255.0
+ no shutdown
+exit
+
+! -- Optional default route 
+ip route 0.0.0.0 0.0.0.0 203.0.113.1
+
+end
+write memory
+
+
+BASIC SECURITY – ENABLE PASSWORD & ENCRYPTION
+
+enable
+configure terminal
+
+! -- Secure privileged EXEC (enable) 
+enable secret STRONG_ENABLE_PASSWORD
+
+! -- Encrypt all passwords in the config 
+service password-encryption
+
+end
+write memory
+
+
+BASIC SECURITY – CONSOLE LINE
+
+enable
+configure terminal
+
+line console 0
+ password C0nsoleP@ss
+ login                      ! require password on console
+ logging synchronous        ! clean up output while typing
+ exec-timeout 10 0          ! optional: auto-logout after 10 minutes
+exit
+
+end
+write memory
+
+
+BASIC SECURITY – VTY (TELNET/SSH) LINES
+
+enable
+configure terminal
+
+! -- Simple password-only VTY (Telnet or SSH) 
+line vty 0 4
+ password VTYp@ss
+ login                      ! use line password
+ transport input telnet ssh ! allow both (for lab) – or "ssh" only
+ exec-timeout 10 0
+exit
+
+end
+write memory
+
+
+SSH CONFIGURATION (RECOMMENDED FOR SECURE REMOTE ACCESS)
+
+enable
+configure terminal
+
+! --- Set a domain name 
+ip domain-name example.local
+
+! -- Create a local user for SSH login 
+username admin privilege 15 secret AdminP@ss123
+
+! -- Generate RSA keys for SSH 
+crypto key generate rsa
+ modulus 1024               ! or 2048 if allowed by Packet Tracer
+
+! -- Force SSH on VTY lines, use local accounts 
+line vty 0 4
+ transport input ssh        ! SSH only
+ login local                ! use local username/password
+ exec-timeout 10 0
+exit
+
+! -- Optional: set SSH version
+ip ssh version 2
+
+end
+write memory
+
+
+SWITCH MANAGEMENT VIA SSH (FULL EXAMPLE)
+
+enable
+configure terminal
+
+hostname S1
+ip domain-name lab.local
+username admin privilege 15 secret Sw1AdminP@ss
+
+! SVI for management
+interface vlan 10
+ ip address 192.168.10.2 255.255.255.0
+ no shutdown
+exit
+
+ip default-gateway 192.168.10.1
+
+crypto key generate rsa
+ modulus 1024
+
+line vty 0 4
+ transport input ssh
+ login local
+ exec-timeout 10 0
+exit
+
+service password-encryption
+
+end
+write memory
+
+
+ROUTER MANAGEMENT VIA SSH
+
+enable
+configure terminal
+
+hostname R1
+ip domain-name lab.local
+username admin privilege 15 secret R1AdminP@ss
+
+interface GigabitEthernet0/0
+ ip address 192.168.10.1 255.255.255.0
+ no shutdown
+exit
+
+crypto key generate rsa
+ modulus 1024
+
+line vty 0 4
+ transport input ssh
+ login local
+ exec-timeout 10 0
+exit
+
+service password-encryption
+enable secret R1EnableP@ss
+
+end
+write memory
+
+
+PC CONNECTIVITY (FROM ROUTER / SWITCH SIDE)
+
+! No Cisco CLI on Packet Tracer PCs for IP config – done via GUI:
+! Desktop tab > IP Configuration:
+!   IP address:       192.168.10.10
+!   Subnet mask:      255.255.255.0
+!   Default gateway:  192.168.10.1
+
+! From Cisco devices, verify ARP / MAC / interface:
+show ip interface brief      ! router IPs and status
+show interfaces              ! errors, duplex, speed
+show arp                     ! router ARP table
+show mac address-table       ! switch MAC address table
+
+
+PING / CONNECTIVITY TESTING
+! From any Cisco device (router/switch):
+ping 192.168.10.1
+ping 192.168.10.2
+ping 192.168.20.1
+ping 10.0.0.2
+
+! Extended ping (from privileged EXEC):
+ping
+  Protocol [ip]:
+  Target IP address: 192.168.20.10
+  Repeat count [5]:
+  Datagram size [100]:
+  Timeout in seconds [2]:
+  Extended commands [n]:
+  Sweep range of sizes [n]:
+
+
+TYPICAL MINIMUM CONFIG CHECKLIST (ROUTER)
+
+enable
+configure terminal
+ hostname R1
+ no ip domain-lookup
+ interface GigabitEthernet0/0
+  ip address <LAN_IP> <SUBNET_MASK>
+  no shutdown
+ exit
+ interface GigabitEthernet0/1
+  ip address <WAN_IP> <SUBNET_MASK>
+  no shutdown
+ exit
+ ip route 0.0.0.0 0.0.0.0 <NEXT_HOP_IP>        ! if needed
+ enable secret <ENABLE_PASSWORD>
+ service password-encryption
+ ip domain-name <DOMAIN>
+ username admin privilege 15 secret <PASSWORD>
+ crypto key generate rsa
+ line console 0
+  password <CONSOLE_PASS>
+  login
+ exit
+ line vty 0 4
+  transport input ssh
+  login local
+ exit
+end
+write memory
+
+TYPICAL MINIMUM CONFIG CHECKLIST (L2 SWITCH)
+
+enable
+configure terminal
+ hostname S1
+ no ip domain-lookup
+ vlan 10
+  name USERS
+ exit
+ interface range FastEthernet0/1 - 24
+  switchport mode access
+  switchport access vlan 10
+  spanning-tree portfast
+ exit
+ interface vlan 10
+  ip address <SWITCH_MGMT_IP> <SUBNET_MASK>
+  no shutdown
+ exit
+ ip default-gateway <ROUTER_LAN_IP>
+ enable secret <ENABLE_PASSWORD>
+ service password-encryption
+ ip domain-name <DOMAIN>
+ username admin privilege 15 secret <PASSWORD>
+ crypto key generate rsa
+ line console 0
+  password <CONSOLE_PASS>
+  login
+ exit
+ line vty 0 4
+  transport input ssh
+  login local
+ exit
+end
+write memory
