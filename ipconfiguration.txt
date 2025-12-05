@@ -1,0 +1,48 @@
+PC commands
+
+# View IP configuration
+ipconfig
+ipconfig /all
+
+# Assign static IP (GUI)
+Desktop > IP Configuration
+-> IP Address
+-> Subnet Mask
+-> Default Gateway
+-> DNS Server (optional)
+
+# Basic connectivity tests
+ping <IP address>
+ping 192.168.x.x
+
+# Test gateway reachability
+ping <default-gateway>
+
+# Test remote LAN connectivity
+ping <remote-host-IP>
+
+# Clear ARP cache
+arp -d
+
+# View ARP table
+arp -a
+
+# Telnet to a Cisco device
+telnet <IP>
+
+# SSH to a Cisco device
+ssh -l <username> <IP>
+
+# Exit from telnet/ssh session
+exit
+
+# Verify DNS resolution (if DNS server exists)
+nslookup <hostname>
+
+# Trace route to a destination (shows each hop)
+tracert <IP address>
+tracert 8.8.8.8
+
+# If hostname is configured
+tracert <hostname>
+
