@@ -1,0 +1,144 @@
+console
+    Use a console cable from PC → device console port.
+    PC > Desktop > Terminal (9600/8/none/1)
+
+access privileged exec mode:
+    <switchHostName>enable
+    <switchHostName>#
+
+access global config mode:
+    <switchHostName>#conf t
+    <switchHostName>(config)#
+
+------------------------------------------------------------
+configure banner message of the day:
+------------------------------------------------------------
+    <return>
+    <switchHostName>enable
+    <switchHostName>#conf t
+    <switchHostName>(config)#banner motd #text message here#
+        (# is just a delimiter, can be any symbol)
+
+------------------------------------------------------------
+access console configuration mode:
+------------------------------------------------------------
+    <switchHostName>(config)#line console 0
+
+------------------------------------------------------------
+configure IP address on an interface:
+------------------------------------------------------------
+    <return>
+    <switchHostName>enable
+    <switchHostName>#conf t
+    <switchHostName>(config)#interface <g0/0/0>   (example)
+    <switchHostName>(config-if)#ip address <IP> <MASK>
+    <switchHostName>(config-if)#no shutdown
+
+------------------------------------------------------------
+configure privileged EXEC mode password:
+------------------------------------------------------------
+    <return>
+    <switchHostName>enable
+    <switchHostName>#conf t
+    <switchHostName>(config)#enable secret <password>
+
+------------------------------------------------------------
+configure console password:
+------------------------------------------------------------
+    <return>
+    <switchHostName>enable
+    <switchHostName>#conf t
+    <switchHostName>(config)#line console 0
+    <switchHostName>(config-line)#password <password>
+
+console connection will ask for a password @ login:
+    <switchHostName>enable
+    <switchHostName>#conf t
+    <switchHostName>(config)#line console 0
+    <switchHostName>(config-line)#login
+
+------------------------------------------------------------
+set domain address:
+------------------------------------------------------------
+    <return>
+    <switchHostName>enable
+    <switchHostName>#conf t
+    <switchHostName>(config)#ip domain-name <domain.com>
+
+------------------------------------------------------------
+generate RSA key with 1024-bit length:
+------------------------------------------------------------
+    <return>
+    <switchHostName>enable
+    <switchHostName>#conf t
+    <switchHostName>(config)#crypto key generate rsa
+        1024
+
+------------------------------------------------------------
+create user with username "_" and secret "_" password:
+------------------------------------------------------------
+    <return>
+    <switchHostName>enable
+    <switchHostName>#conf t
+    <switchHostName>(config)#username <user> secret <password>
+        (example: username sshuser secret cisco123)
+
+------------------------------------------------------------
+enable SSH on VTY lines:
+------------------------------------------------------------
+    <return>
+    <switchHostName>enable
+    <switchHostName>#conf t
+    <switchHostName>(config)#line vty 0 4
+    <switchHostName>(config-line)#login local
+    <switchHostName>(config-line)#transport input ssh
+
+------------------------------------------------------------
+encrypt all passwords:
+------------------------------------------------------------
+    <switchHostName>enable
+    <switchHostName>#conf t
+    <switchHostName>(config)#service password-encryption
+
+------------------------------------------------------------
+configure switch management VLAN IP (SVI):
+------------------------------------------------------------
+    <switchHostName>enable
+    <switchHostName>#conf t
+    <switchHostName>(config)#interface vlan 1   (or assigned mgmt VLAN)
+    <switchHostName>(config-if)#ip address <IP> <MASK>
+    <switchHostName>(config-if)#no shutdown
+
+configure switch default gateway:
+    <switchHostName>(config)#ip default-gateway <gateway-IP>
+
+------------------------------------------------------------
+verify settings:
+------------------------------------------------------------
+    show run
+    show ip interface brief
+    show interfaces status
+    show vlan brief
+    show arp
+    show version
+    show ip route
+
+------------------------------------------------------------
+save configuration:
+------------------------------------------------------------
+    copy run start
+
+------------------------------------------------------------
+FROM PC: secure remote session:
+------------------------------------------------------------
+    C:\> ssh -l <SSHuser> <router/switch IP>
+
+    (example)
+    C:\> ssh -l sshuser 192.168.1.1
+
+------------------------------------------------------------
+PC network testing:
+------------------------------------------------------------
+    C:\> ipconfig
+    C:\> ping <IP>
+    C:\> tracert <IP>
