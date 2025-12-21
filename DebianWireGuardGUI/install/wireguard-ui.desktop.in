@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=WireGuard UI
+Comment=WireGuard GUI for Debian
+Exec=__APP_DIR__/scripts/start-root.sh
+Path=__APP_DIR__
+Icon=__APP_DIR__/app/assets/shodan.png
+Terminal=false
+StartupNotify=true
+Categories=Network;VPN;
