@@ -43,8 +43,8 @@ bash install/install.sh
 ```
 
 ## Security / Privacy
-This repository contains no private keys, configs, or personal data. Tunnel configs live in
-`/etc/wireguard` at runtime and are not included here. Do not commit real `.conf` files.
+This repository contains no private keys, configs, or personal data.
+`/etc/wireguard` at runtime and are not included here.
 
 ## Project Layout
 - `app/` Electron main/renderer source
