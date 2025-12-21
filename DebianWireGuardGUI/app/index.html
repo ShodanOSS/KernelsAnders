@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'"
+    />
+    <title>WireGuard</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="renderer.js" defer></script>
+  </head>
+  <body>
+    <div class="frame">
+      <div class="window">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">WG</div>
+          <div class="brand-text">
+            <div class="brand-title">WireGuard</div>
+            <div class="brand-subtitle">Debian Client</div>
+          </div>
+        </div>
+        <nav class="nav">
+          <button class="nav-item active">Tunnels</button>
+          <button class="nav-item" id="nav-log">Log</button>
+          <button class="nav-item" id="nav-settings">Settings</button>
+          <button class="nav-item" id="nav-about">About</button>
+        </nav>
+        <div class="sidebar-footer">
+          <div class="status-dot"></div>
+          <span>Service ready</span>
+        </div>
+      </aside>
+
+      <main class="content">
+        <div class="corner-icon">
+          <img src="assets/shodan.png" alt="Shodan" />
+        </div>
+        <div id="error-banner" class="error-banner" hidden></div>
+
+        <header class="header">
+          <div>
+            <div class="header-title">Tunnels</div>
+            <div class="header-subtitle">Manage your WireGuard connections</div>
+          </div>
+          <div class="header-actions">
+            <button class="ghost" id="import-button">Import tunnel(s) from file</button>
+            <button class="ghost" id="add-button">Add empty tunnel</button>
+          </div>
+        </header>
+
+        <section class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Tunnels</div>
+            <div class="panel-actions">
+              <button class="ghost small" id="export-button">Export</button>
+              <button class="ghost small" id="edit-button">Edit</button>
+              <button class="ghost small" id="delete-button">Delete</button>
+            </div>
+          </div>
+
+          <div class="tunnel-list" id="tunnel-list"></div>
+        </section>
+
+        <section class="panel details">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title" id="detail-name">No tunnel selected</div>
+              <div class="detail-status" id="detail-status">--</div>
+            </div>
+            <button class="primary" id="detail-toggle" disabled>Activate</button>
+          </div>
+          <div class="detail-grid">
+            <div class="detail">
+              <div class="detail-label">Public key</div>
+              <div class="detail-value" id="detail-public-key">--</div>
+            </div>
+            <div class="detail">
+              <div class="detail-label">Address</div>
+              <div class="detail-value" id="detail-address">--</div>
+            </div>
+            <div class="detail">
+              <div class="detail-label">Endpoint</div>
+              <div class="detail-value" id="detail-endpoint">--</div>
+            </div>
+            <div class="detail">
+              <div class="detail-label">Transfer</div>
+              <div class="detail-value" id="detail-transfer">--</div>
+            </div>
+            <div class="detail">
+              <div class="detail-label">Latest handshake</div>
+              <div class="detail-value" id="detail-handshake">--</div>
+            </div>
+            <div class="detail">
+              <div class="detail-label">Listen port</div>
+              <div class="detail-value" id="detail-listen-port">--</div>
+            </div>
+            <div class="detail">
+              <div class="detail-label">Peers</div>
+              <div class="detail-value" id="detail-peer-count">--</div>
+            </div>
+          </div>
+          <div class="detail-actions">
+            <button class="ghost" id="copy-key-button">Copy public key</button>
+            <button class="ghost" id="view-config-button">View config</button>
+          </div>
+          <div class="peer-section">
+            <div class="peer-header">
+              <div class="peer-title">Peers</div>
+              <div class="peer-refresh" id="peer-refresh-note"></div>
+            </div>
+            <div class="peer-list" id="peer-list"></div>
+          </div>
+        </section>
+
+        <footer class="footer">
+          <div class="footer-left">
+            <span>WireGuard UI</span>
+            <span class="divider">|</span>
+            <span>Linux kernel interface</span>
+          </div>
+          <div class="footer-right">
+            <button class="ghost" id="restart-button">Restart service</button>
+            <button class="ghost" id="quit-button">Quit</button>
+          </div>
+        </footer>
+      </main>
+      </div>
+    </div>
+
+    <div class="modal" id="config-modal" hidden>
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-title" id="config-modal-title">Edit tunnel</div>
+          <button class="ghost small" id="config-cancel">Close</button>
+        </div>
+        <textarea id="config-text" spellcheck="false"></textarea>
+        <div class="modal-actions">
+          <button class="primary" id="config-save">Save changes</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="input-modal" hidden>
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-title" id="input-modal-title">New tunnel</div>
+          <button class="ghost small" id="input-modal-cancel">Cancel</button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-message" id="input-modal-message"></div>
+          <input id="input-modal-field" type="text" autocomplete="off" />
+        </div>
+        <div class="modal-actions">
+          <button class="primary" id="input-modal-submit">Create</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="info-modal" hidden>
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-title" id="info-modal-title">Info</div>
+          <button class="ghost small" id="info-modal-close">Close</button>
+        </div>
+        <pre class="modal-pre" id="info-modal-body"></pre>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "name": "kernlsanders-wireguard-gui",
+  "version": "0.1.0",
+  "description": "WireGuard Windows-like GUI replica for Debian",
+  "main": "app/main.js",
+  "scripts": {
+    "start": "bash scripts/start.sh",
+    "start:software": "WG_FORCE_SOFTWARE=1 bash scripts/start.sh",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "^29.1.0",
+    "electron-builder": "^24.13.3"
+  }
+}
